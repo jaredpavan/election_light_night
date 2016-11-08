@@ -1,25 +1,26 @@
-require 'HTTParty'
-require 'Nokogiri'
-require 'JSON'
-require 'Pry'
-require 'csv'
+require 'httparty'
+require 'nokogiri'
+require 'json'
 
 # Navigate to http://www.developers.meethue.com/documentation/getting-started 
 # for the following three variables
-username=(update with your generated Hue username)
-ip=(update with your Hue Bridge IP address)
-light_id=(update with your target light ID)
+@username="h3mao-ggdyHFYjt6OSx1ZFBABoWoDsJHiTszMET2"
+@ip="http://192.168.1.203"
+@light_id="3"
 
 # Color codes
-white=13544
-blue=47125
-red=65413
+WHITE=14956
+BLUE=47125
+RED=65413
 
-base_request='curl -s -XPUT "http://' + ip + '/api/' + username 
-base_request=base_request + '/lights/' + light_id
-base_request=base_request + '/state" --header "Content-Type: application/json"'
-base_request=base_request + ' --header "Accept: application/json"'
-base_request=base_request + '--data "{\"on\":true, \"sat\":254, \"bri\":254, \"hue\":'
+def change_light(color)
+  data={"on":true, "sat":254, "bri":254, "hue":color}
+
+  response = HTTParty.put("#{@ip}/api/#{@username}/lights/#{@light_id}/state",  
+                           :body => data.to_json,
+                           :headers => { "Content-Type" => 'application/json'})
+end
+
 
 page = HTTParty.get('http://www.politico.com/2016-election/results/map/president')
 
@@ -29,14 +30,9 @@ hillary_electoral_votes = parse_page.css('.macro').children[0].text.to_i
 trump_electoral_votes = parse_page.css('.macro').children[2].text.to_i
 
 if hillary_electoral_votes > trump_electoral_votes
-  # shell out and make blue
-  make_blue=base_request + blue + '}"'
-  exec make_blue
+  change_light(BLUE)
 elsif trump_electoral_votes > hillary_electoral_votes
-  # shell out and make red
-  make_red=base_request + red + '}"'
-  exec make_red
+  change_light(RED)
 else
-  # shell out and make white
-  make_white=base_request + white + '}"'
-  exec make_white
+  change_light(WHITE)
+end
