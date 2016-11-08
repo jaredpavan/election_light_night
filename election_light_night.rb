@@ -26,7 +26,7 @@ end
 
 # Celebrate victory for 60 seconds
 def declare_victory(color)
-  for n in 1..60
+  loop do
     change_light(color)
     sleep(0.5)
     change_light(WHITE)
