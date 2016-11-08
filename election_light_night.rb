@@ -8,7 +8,7 @@ require 'json'
 # for the following three variables
 @username="replace with your user name"
 @ip="replace with your Hue Bridge IP"
-@light_id="replace with your target light"
+@light_id="replace with your target light ID"
 
 # CONSTANT Color codes
 WHITE=14956
