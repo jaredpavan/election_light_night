@@ -3,12 +3,13 @@
 require 'httparty'
 require 'nokogiri'
 require 'json'
+require 'pry'
 
 # Navigate to http://www.developers.meethue.com/documentation/getting-started 
 # for the following three variables
-@username="replace with your user name"
-@ip="replace with your Hue Bridge IP"
-@light_id="replace with your target light ID"
+@username="h3mao-ggdyHFYjt6OSx1ZFBABoWoDsJHiTszMET2"
+@ip="http://192.168.1.203"
+@light_id="3"
 
 # CONSTANT Color codes
 WHITE=14956
@@ -36,10 +37,11 @@ end
 
 # Run vote checker every 60 seconds
 loop do
-  page = HTTParty.get('http://www.politico.com/2016-election/results/map/president')
+  page = HTTParty.get('http://www.nytimes.com/elections/results/president')
   parse_page = Nokogiri::HTML(page)
-  hillary_electoral_votes = parse_page.css('.type-democrat').css('.macro').children.first.text.to_i
-  trump_electoral_votes = parse_page.css('.type-republican').css('.macro').children.first.text.to_i
+  eln_object = parse_page.css('.eln-office-president').first.css('.eln-groups')
+  hillary_electoral_votes = eln_object.css('.eln-democrat').css('.eln-count').text.to_i
+  trump_electoral_votes = eln_object.css('.eln-republican').css('.eln-count').text.to_i
 
   if hillary_electoral_votes >= 270
     declare_victory(BLUE)
@@ -54,5 +56,5 @@ loop do
   end
   
   puts "Hillary: #{hillary_electoral_votes} Trump: #{trump_electoral_votes}"
-  sleep(60)
+  sleep(30)
 end
