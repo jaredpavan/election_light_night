@@ -35,26 +35,51 @@ def declare_victory(color)
   end
 end
 
+def result_change_alert(color)
+  change_light(WHITE)
+  sleep(0.5)
+  change_light(color)
+  sleep(0.5)
+  change_light(WHITE)
+  sleep(0.5)
+end
+
+@previous_hillary_count=0
+@previous_trump_count=0
+@hillary_electoral_votes=0
+@trump_electoral_votes=0
+
 # Run vote checker every 60 seconds
 loop do
+  @previous_hillary_count=@hillary_electoral_votes
+  @previous_trump_count=@trump_electoral_votes
+
   page = HTTParty.get('http://www.nytimes.com/elections/results/president')
   parse_page = Nokogiri::HTML(page)
   eln_object = parse_page.css('.eln-office-president').first.css('.eln-groups')
-  hillary_electoral_votes = eln_object.css('.eln-democrat').css('.eln-count').text.to_i
-  trump_electoral_votes = eln_object.css('.eln-republican').css('.eln-count').text.to_i
+  @hillary_electoral_votes = eln_object.css('.eln-democrat').css('.eln-count').text.to_i
+  @trump_electoral_votes = eln_object.css('.eln-republican').css('.eln-count').text.to_i
 
-  if hillary_electoral_votes >= 270
+  # Send flash alert for a score change
+  if @previous_hillary_count != @hillary_electoral_votes
+    result_change_alert(BLUE)
+  end  
+  if @previous_trump_count != @trump_electoral_votes
+    result_change_alert(RED)
+  end
+
+  if @hillary_electoral_votes >= 270
     declare_victory(BLUE)
-  elsif trump_electoral_votes >= 270
+  elsif @trump_electoral_votes >= 270
     declare_victory(RED)
-  elsif hillary_electoral_votes > trump_electoral_votes
+  elsif @hillary_electoral_votes > @trump_electoral_votes
     change_light(BLUE)
-  elsif trump_electoral_votes > hillary_electoral_votes
+  elsif @trump_electoral_votes > @hillary_electoral_votes
     change_light(RED)
   else
     change_light(WHITE)
   end
   
-  puts "Hillary: #{hillary_electoral_votes} Trump: #{trump_electoral_votes}"
-  sleep(30)
+  puts "Hillary: #{@hillary_electoral_votes} Trump: #{@trump_electoral_votes}"
+  sleep(10)
 end
